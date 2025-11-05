@@ -15,7 +15,7 @@ Ts = range(1.0, 3, 30)
 tm.parallel_tempering = (mc = Ising.MC, parameter = :T, values = Ts, interval = 1)
 
 # initializing the system
-lattice_param_list = []
+dp = [0.1, 0.2]
 for dp in DP
     # setting iterations per grid size
     for itnum in [(20, 10), (10, 20), (4,40)]
