@@ -1,4 +1,4 @@
-# diluted_pt.jl
+# parallel_tempering.jl
 
 using Carlo
 using Carlo.JobTools
@@ -10,20 +10,25 @@ tm.sweeps = 20000
 tm.thermalization = 2000
 tm.binsize = 100
 
-Ts = range(1.5, 4, 30)
-
-# contract temperatures around Tc for better distribution overlap
-Tc = 2.269
-Ts += 0.5 .* (Tc .- Ts) ./ (0.6 .+ (Tc .- Ts) .^ 2)
+Ts = range(1.0, 3, 30)
 
 tm.parallel_tempering = (mc = Ising.MC, parameter = :T, values = Ts, interval = 1)
 
-Ls = [32, 64]
-for L in Ls
-    tm.Lx = L
-    tm.Ly = L
-    # tm.T is set implicitly by ParallelTemperingMC
-    task(tm)
+# initializing the system
+lattice_param_list = []
+for dp in DP
+    # setting iterations per grid size
+    for itnum in [(20, 10), (10, 20), (4,40)]
+    # for itnum in [(20, 6)]
+        for i in 1:itnum[1] 
+            # grid size 
+            tm.Lx = itnum[2]
+            tm.Ly = itnum[2]
+            # dilution percent
+            tm.DP = dp 
+            task(tm)
+        end
+    end
 end
 
 job = JobInfo(

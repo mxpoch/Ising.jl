@@ -7,11 +7,11 @@ using Ising
 tm = TaskMaker()
 
 tm.sweeps = 20000
-tm.thermalization = 2000
+tm.thermalization = 8000
 tm.binsize = 100
 
 Ts = range(1, 3, 15)
-Ls = [8, 12, 16]
+Ls = [20]
 for L in Ls
     for T in Ts
         tm.T = T

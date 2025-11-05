@@ -5,7 +5,6 @@ using HDF5
 
 mutable struct MC <: AbstractMC
     T::Float64
-
     spins::Matrix{Int8}
 end
 
@@ -16,8 +15,26 @@ function MC(params::AbstractDict)
     return MC(T, zeros(Lx, Ly))
 end
 
+function dilute!(lattice::AbstractMatrix, DP::Float64)
+    # dont dilute if its over the critical number of sites
+    if DP > 0.4
+        throw(ArgumentError("Dilution Percentage must be below 40%"))
+    end
+    N = size(lattice)[1]
+    site_num = Int(round(N*N*DP))
+    for i in 1:site_num
+        idilute = rand(1:N*N)
+        while lattice[idilute] == 0
+            idilute = rand(1:N*N) 
+        end
+        lattice[idilute] = 0
+    end
+end
+
 function Carlo.init!(mc::MC, ctx::MCContext, params::AbstractDict)
-    mc.spins .= rand(ctx.rng, Bool, size(mc.spins)) .* 2 .- 1
+    lattice = rand(ctx.rng, Bool, size(mc.spins)) .* 2 .- 1
+    dilute!(lattice, params.DP)
+    mc.spins .= lattice
     return nothing
 end
 
