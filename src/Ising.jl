@@ -33,7 +33,7 @@ end
 
 function Carlo.init!(mc::MC, ctx::MCContext, params::AbstractDict)
     lattice = rand(ctx.rng, Bool, size(mc.spins)) .* 2 .- 1
-    dilute!(lattice, params.DP)
+    dilute!(lattice, params[:DP])
     mc.spins .= lattice
     return nothing
 end
